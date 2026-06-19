@@ -79,9 +79,12 @@ var containerName = builder.Configuration["AzureStorage:ContainerName"] ?? "pdff
 
 builder.Services.AddSingleton<IStorage>(sp =>
 {
+    var logger = sp.GetRequiredService<ILogger<AzureBlobStorage>>();
+    logger.LogInformation("Initializing Azure Blob Storage with connection string and container: {ContainerName}", containerName);
+
     var blobServiceClient = new BlobServiceClient(storageConnectionString);
     var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-    return new AzureBlobStorage(blobContainerClient);
+    return new AzureBlobStorage(blobContainerClient, logger);
 });
 
 // Register handlers as scoped
@@ -129,5 +132,5 @@ app.MapUploadPdfEndpoint();
 app.MapDownloadPdfEndpoint();
 app.MapListPdfsEndpoint();
 app.MapDeletePdfEndpoint();
-
+app.MapGet("/hello", () => "helloBack");
 app.Run();
