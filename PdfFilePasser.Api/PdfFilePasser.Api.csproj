@@ -9,5 +9,6 @@
     <PackageReference Include="Aspire.Hosting.Azure.Storage" Version="8.2.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.8" />
   </ItemGroup>
 </Project>

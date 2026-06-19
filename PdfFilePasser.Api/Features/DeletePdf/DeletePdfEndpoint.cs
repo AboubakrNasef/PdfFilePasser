@@ -7,6 +7,8 @@ public static class DeletePdfEndpoint
         app.MapDelete("/api/pdf/{fileId}", Handle)
             .WithName("DeletePdf")
             .WithOpenApi()
+            .WithSummary("Delete a PDF file")
+            .WithDescription("Delete a PDF file by its file ID.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
     }

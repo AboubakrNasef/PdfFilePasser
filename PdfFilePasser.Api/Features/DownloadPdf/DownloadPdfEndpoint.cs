@@ -7,6 +7,8 @@ public static class DownloadPdfEndpoint
         app.MapGet("/api/pdf/{fileId}", Handle)
             .WithName("DownloadPdf")
             .WithOpenApi()
+            .WithSummary("Download a PDF file")
+            .WithDescription("Download a PDF file by its file ID.")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
     }

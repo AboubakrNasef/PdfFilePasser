@@ -7,6 +7,8 @@ public static class ListPdfsEndpoint
         app.MapGet("/api/pdf/list", Handle)
             .WithName("ListPdfs")
             .WithOpenApi()
+            .WithSummary("List all PDF files")
+            .WithDescription("Retrieve a list of all uploaded PDF files with their metadata.")
             .Produces<IEnumerable<object>>(StatusCodes.Status200OK);
     }
 

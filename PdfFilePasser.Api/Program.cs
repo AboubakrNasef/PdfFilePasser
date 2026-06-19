@@ -20,6 +20,17 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOpenApi();
 
+// Add Swagger/Swashbuckle
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new()
+    {
+        Title = "PDF File Passer API",
+        Version = "v1",
+        Description = "API for uploading, downloading, listing, and deleting PDF files"
+    });
+});
+
 // Register Azure Blob Storage
 var storageConnectionString = builder.Configuration["AzureStorage:ConnectionString"]
     ?? "UseDevelopmentStorage=true";
@@ -42,7 +53,15 @@ var app = builder.Build();
 
 // Middleware
 if (app.Environment.IsDevelopment())
+{
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "PDF File Passer API v1");
+        options.RoutePrefix = string.Empty;
+    });
+}
 
 app.UseCors("AllowAngular");
 
