@@ -5,6 +5,7 @@ import { UploadComponent } from './features/upload/upload.component';
 import { ListComponent } from './features/list/list.component';
 import { ViewerComponent } from './features/viewer/viewer.component';
 
+
 export const routes: Routes = [
   {
     path: '',

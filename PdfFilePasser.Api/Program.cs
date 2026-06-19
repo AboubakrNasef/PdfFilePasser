@@ -7,6 +7,8 @@ using PdfFilePasser.Api.Features.PdfUpload;
 using PdfFilePasser.Api.Features.DownloadPdf;
 using PdfFilePasser.Api.Features.ListPdfs;
 using PdfFilePasser.Api.Features.DeletePdf;
+using PdfFilePasser.Api.Features.ViewPdf;
+using PdfFilePasser.Api.Features.StreamPdf;
 using PdfFilePasser.Api.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -92,6 +94,8 @@ builder.Services.AddScoped<UploadPdfHandler>();
 builder.Services.AddScoped<DownloadPdfHandler>();
 builder.Services.AddScoped<ListPdfsHandler>();
 builder.Services.AddScoped<DeletePdfHandler>();
+builder.Services.AddScoped<ViewPdfHandler>();
+builder.Services.AddScoped<StreamPdfHandler>();
 
 var app = builder.Build();
 
@@ -132,5 +136,7 @@ app.MapUploadPdfEndpoint();
 app.MapDownloadPdfEndpoint();
 app.MapListPdfsEndpoint();
 app.MapDeletePdfEndpoint();
+app.MapViewPdfEndpoint();
+app.MapStreamPdfEndpoint();
 app.MapGet("/hello", () => "helloBack");
 app.Run();

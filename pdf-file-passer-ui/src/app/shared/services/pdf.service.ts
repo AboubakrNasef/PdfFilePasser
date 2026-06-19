@@ -57,4 +57,34 @@ export class PdfService {
   getPdfUrl(fileId: string) {
     return `${this.apiUrl}/${fileId}`;
   }
+
+  viewPdf(fileId: string) {
+    const viewUrl = `${this.apiUrl}/${fileId}/view`;
+    console.log('Viewing PDF from:', viewUrl);
+    return this.http.get<{ pdfBytes: any; fileName: string; contentType: string }>(viewUrl);
+  }
+
+  getPdfBlobUrl(pdfBytes: any): string {
+    const binaryData = [];
+    binaryData.push(pdfBytes);
+    const blobUrl = URL.createObjectURL(new Blob(binaryData, { type: 'application/pdf' }));
+    console.log('Created blob URL for PDF:', blobUrl);
+    return blobUrl;
+  }
+
+  getStreamUrl(fileId: string) {
+    const streamUrlEndpoint = `${this.apiUrl}/${fileId}/stream-url`;
+    console.log('Getting stream URL from:', streamUrlEndpoint);
+    return this.http.get<{ streamUrl: string; fileName: string; fileSize: number; contentType: string }>(streamUrlEndpoint);
+  }
+
+  getDirectStreamUrl(fileId: string): string {
+    const streamUrl = `${this.apiUrl}/${fileId}/stream`;
+    console.log('Direct stream URL:', streamUrl);
+    return streamUrl;
+  }
+
+  getApiUrl(): string {
+    return `${environment.apiUrl}`;
+  }
 }

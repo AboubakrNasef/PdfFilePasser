@@ -5,6 +5,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 var storage = builder.AddAzureStorage("storage")
 	.RunAsEmulator(azurite =>
 	{
+		azurite.WithDataBindMount("pdfpasser0azurite");
 		azurite.WithBlobPort(27000)
 			   .WithQueuePort(27001)
 			   .WithTablePort(27002);

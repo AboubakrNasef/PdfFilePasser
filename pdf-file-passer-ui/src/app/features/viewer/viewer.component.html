@@ -1,0 +1,23 @@
+<div class="viewer-wrapper">
+  <div class="viewer-tabs">
+         @for (method of allowedMethods(); track method.id)
+         {
+    <button
+      (click)="selectMethod(method.id)"
+      [class.active]="selectedMethod() === method.id"
+      class="tab-button">
+      <span class="icon">{{ method.icon }}</span>
+      <span class="label">{{ method.label }}</span>
+    </button>}
+  </div>
+
+  <div class="viewer-content">
+    @if (selectedMethod() === 'blob') {
+      <app-blob-viewer />
+    } @else if (selectedMethod() === 'stream') {
+      <app-stream-viewer />
+    } @else if (selectedMethod() === 'direct-stream') {
+      <app-direct-stream-viewer />
+    }
+  </div>
+</div>
