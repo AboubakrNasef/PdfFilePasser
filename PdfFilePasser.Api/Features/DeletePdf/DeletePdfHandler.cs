@@ -1,17 +1,18 @@
+using PdfFilePasser.Api.Storage;
 using PdfFilePasser.Api.Features.Common;
 
 namespace PdfFilePasser.Api.Features.DeletePdf;
 
-public class DeletePdfHandler(IStorageFolder pdfFolder)
+public class DeletePdfHandler(IStorage storage)
 {
     public async Task Handle(string fileId, CancellationToken cancellation)
     {
-        var files = await pdfFolder.ListFilesAsync(null, null, cancellation);
-        var file = files.FirstOrDefault(f => f.Name.Contains(fileId));
+        var blobs = await storage.ListFilesAsync(null, null, cancellation);
+        var blob = blobs.FirstOrDefault(b => b.Name.EndsWith($"_{fileId}.pdf"));
 
-        if (file == null)
+        if (blob == null)
             throw new PdfNotFoundException($"PDF with ID {fileId} not found");
 
-        await file.DeleteAsync(cancellation);
+        await blob.DeleteAsync(cancellation);
     }
 }

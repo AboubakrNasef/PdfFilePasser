@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { signal } from '@angular/core';
 import { PdfService } from '../../shared/services/pdf.service';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-upload',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="upload-container">
       <h2>Upload PDF</h2>
@@ -21,8 +23,8 @@ import { Router } from '@angular/router';
         />
         <label class="file-label" (click)="fileInput.click()">
           <span class="upload-icon">📄</span>
-          <span *ngIf="!selectedFile" class="upload-text">Click to select a PDF file</span>
-          <span *ngIf="selectedFile" class="upload-text">{{ selectedFile.name }}</span>
+          <span *ngIf="!selectedFile()" class="upload-text">Click to select a PDF file</span>
+          <span *ngIf="selectedFile()" class="upload-text">{{ selectedFile()?.name }}</span>
         </label>
       </div>
 
@@ -30,21 +32,22 @@ import { Router } from '@angular/router';
         <label for="description">Description (optional):</label>
         <textarea
           id="description"
-          [(ngModel)]="description"
+          [ngModel]="description()"
+          (ngModelChange)="description.set($event)"
           class="textarea"
           placeholder="Add a description for this PDF..."
         ></textarea>
       </div>
 
-      <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage }}
+      <div *ngIf="errorMessage()" class="error-message">
+        {{ errorMessage() }}
       </div>
 
-      <div *ngIf="successMessage" class="success-message">
-        {{ successMessage }}
+      <div *ngIf="successMessage()" class="success-message">
+        {{ successMessage() }}
       </div>
 
-      <div *ngIf="uploading" class="progress">
+      <div *ngIf="uploading()" class="progress">
         <div class="progress-bar">
           <div class="progress-fill"></div>
         </div>
@@ -53,10 +56,10 @@ import { Router } from '@angular/router';
 
       <button
         (click)="uploadFile()"
-        [disabled]="!selectedFile || uploading"
+        [disabled]="!selectedFile() || uploading()"
         class="btn btn-primary"
       >
-        {{ uploading ? 'Uploading...' : 'Upload PDF' }}
+        {{ uploading() ? 'Uploading...' : 'Upload PDF' }}
       </button>
     </div>
   `,
@@ -195,11 +198,11 @@ import { Router } from '@angular/router';
   `]
 })
 export class UploadComponent {
-  selectedFile: File | null = null;
-  description = '';
-  uploading = false;
-  errorMessage = '';
-  successMessage = '';
+  selectedFile = signal<File | null>(null);
+  description = signal('');
+  uploading = signal(false);
+  errorMessage = signal('');
+  successMessage = signal('');
 
   constructor(private pdfService: PdfService, private router: Router) {}
 
@@ -208,36 +211,36 @@ export class UploadComponent {
     const files = target.files;
 
     if (files && files.length > 0) {
-      this.selectedFile = files[0];
-      this.errorMessage = '';
-      this.successMessage = '';
+      this.selectedFile.set(files[0]);
+      this.errorMessage.set('');
+      this.successMessage.set('');
     }
   }
 
   uploadFile(): void {
-    if (!this.selectedFile) {
-      this.errorMessage = 'Please select a file first';
+    if (!this.selectedFile()) {
+      this.errorMessage.set('Please select a file first');
       return;
     }
 
-    this.uploading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.uploading.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
 
-    this.pdfService.uploadPdf(this.selectedFile, this.description).subscribe({
+    this.pdfService.uploadPdf(this.selectedFile()!, this.description()).subscribe({
       next: (response) => {
-        this.uploading = false;
-        this.successMessage = `PDF "${response.fileName}" uploaded successfully!`;
-        this.selectedFile = null;
-        this.description = '';
+        this.uploading.set(false);
+        this.successMessage.set(`PDF "${response.fileName}" uploaded successfully!`);
+        this.selectedFile.set(null);
+        this.description.set('');
 
         setTimeout(() => {
           this.router.navigate(['/list']);
         }, 1500);
       },
       error: (error) => {
-        this.uploading = false;
-        this.errorMessage = error.error?.message || 'Error uploading file. Please try again.';
+        this.uploading.set(false);
+        this.errorMessage.set(error.error?.message || 'Error uploading file. Please try again.');
       }
     });
   }

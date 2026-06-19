@@ -1,25 +1,26 @@
+using PdfFilePasser.Api.Storage;
 using PdfFilePasser.Api.Features.Common;
 
 namespace PdfFilePasser.Api.Features.ListPdfs;
 
-public class ListPdfsHandler(IStorageFolder pdfFolder)
+public class ListPdfsHandler(IStorage storage)
 {
     public async Task<IEnumerable<PdfFileInfo>> Handle(CancellationToken cancellation)
     {
-        var files = await pdfFolder.ListFilesAsync(null, null, cancellation);
+        var blobs = await storage.ListFilesAsync(null, null, cancellation);
 
         var pdfs = new List<PdfFileInfo>();
-        foreach (var file in files)
+        foreach (var blob in blobs)
         {
-            var props = await file.GetPropertiesAsync(cancellation);
-            var fileId = ExtractFileId(file.Name);
+            var props = await blob.GetPropertiesAsync(cancellation);
+            var fileId = ExtractFileId(blob.Name);
 
             pdfs.Add(new PdfFileInfo
             {
                 FileId = fileId,
-                FileName = props.TryGetValue("OriginalFileName", out var name) ? name : file.Name,
-                UploadedAt = file.Modified ?? DateTime.UtcNow,
-                FileSizeBytes = file.Size ?? 0,
+                FileName = props.TryGetValue("OriginalFileName", out var name) ? name : blob.Name,
+                UploadedAt = blob.Modified ?? DateTime.UtcNow,
+                FileSizeBytes = blob.Size ?? 0,
                 Description = props.TryGetValue("Description", out var desc) ? desc : null
             });
         }

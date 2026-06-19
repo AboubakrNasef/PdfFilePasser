@@ -1,0 +1,18 @@
+D:\Programming\0.Practice\ASPProjects\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.csproj.AssemblyReference.cache
+D:\Programming\0.Practice\ASPProjects\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\rpswa.dswa.cache.json
+D:\Programming\0.Practice\ASPProjects\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.GeneratedMSBuildEditorConfig.editorconfig
+D:\Programming\0.Practice\ASPProjects\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.AssemblyInfoInputs.cache
+D:\Programming\0.Practice\ASPProjects\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.AssemblyInfo.cs
+D:\Programming\0.Practice\ASPProjects\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.csproj.CoreCompileInputs.cache
+D:\Programming\0.Practice\ASPProjects\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.MvcApplicationPartsAssemblyInfo.cs
+D:\Programming\0.Practice\ASPProjects\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.MvcApplicationPartsAssemblyInfo.cache
+D:\Programming\0.Practice\ASPProjects\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.sourcelink.json
+D:\Programming\0.Practice\ASP Practrical\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.csproj.AssemblyReference.cache
+D:\Programming\0.Practice\ASP Practrical\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\rpswa.dswa.cache.json
+D:\Programming\0.Practice\ASP Practrical\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.GeneratedMSBuildEditorConfig.editorconfig
+D:\Programming\0.Practice\ASP Practrical\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.AssemblyInfoInputs.cache
+D:\Programming\0.Practice\ASP Practrical\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.AssemblyInfo.cs
+D:\Programming\0.Practice\ASP Practrical\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.csproj.CoreCompileInputs.cache
+D:\Programming\0.Practice\ASP Practrical\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.MvcApplicationPartsAssemblyInfo.cs
+D:\Programming\0.Practice\ASP Practrical\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.MvcApplicationPartsAssemblyInfo.cache
+D:\Programming\0.Practice\ASP Practrical\PdfFilePasser\PdfFilePasser.Api\obj\Debug\net9.0\PdfFilePasser.Api.sourcelink.json

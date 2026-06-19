@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="PdfFilePasser.Api/PdfFilePasser.Api.csproj" />
+  <Project Path="PdfFilePasser.Aspire/PdfFilePasser.Aspire.AppHost/PdfFilePasser.Aspire.AppHost.csproj" />
+  <Project Path="PdfFilePasser.Aspire/PdfFilePasser.Aspire.ServiceDefaults/PdfFilePasser.Aspire.ServiceDefaults.csproj" />
+</Solution>

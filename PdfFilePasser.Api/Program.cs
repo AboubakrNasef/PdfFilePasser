@@ -1,10 +1,11 @@
-using FluentStorage;
+using Azure.Storage.Blobs;
 using PdfFilePasser.Api.Features.PdfUpload;
 using PdfFilePasser.Api.Features.DownloadPdf;
 using PdfFilePasser.Api.Features.ListPdfs;
 using PdfFilePasser.Api.Features.DeletePdf;
+using PdfFilePasser.Api.Storage;
 
-var builder = WebApplicationBuilder.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services
 builder.Services.AddCors(options =>
@@ -19,26 +20,16 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOpenApi();
 
-// Register FluentStorage with Azure Blob Storage
+// Register Azure Blob Storage
 var storageConnectionString = builder.Configuration["AzureStorage:ConnectionString"]
     ?? "UseDevelopmentStorage=true";
+var containerName = builder.Configuration["AzureStorage:ContainerName"] ?? "pdffiles";
 
-builder.Services.AddSingleton(sp =>
+builder.Services.AddSingleton<IStorage>(sp =>
 {
-    var blobStorage = StorageFactory.Blobs.AzureBlobStorage(storageConnectionString);
-    var containerName = builder.Configuration["AzureStorage:ContainerName"] ?? "pdffiles";
-
-    // Ensure container exists
-    try
-    {
-        blobStorage.CreateContainerAsync(containerName).Wait();
-    }
-    catch
-    {
-        // Container might already exist
-    }
-
-    return blobStorage[containerName];
+    var blobServiceClient = new BlobServiceClient(storageConnectionString);
+    var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+    return new AzureBlobStorage(blobContainerClient);
 });
 
 // Register handlers as scoped

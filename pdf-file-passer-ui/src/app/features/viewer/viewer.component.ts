@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { signal } from '@angular/core';
 import { PdfService } from '../../shared/services/pdf.service';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
@@ -12,23 +13,23 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     <div class="viewer-container">
       <div class="viewer-header">
         <a routerLink="/list" class="back-link">← Back to PDFs</a>
-        <h2>{{ fileName }}</h2>
+        <h2>{{ fileName() }}</h2>
       </div>
 
-      <div *ngIf="loading" class="loading">
+      <div *ngIf="loading()" class="loading">
         <p>Loading PDF...</p>
       </div>
 
-      <div *ngIf="!loading && pdfUrl" class="viewer-content">
+      <div *ngIf="!loading() && pdfUrl()" class="viewer-content">
         <ngx-extended-pdf-viewer
-          [src]="pdfUrl"
+          [src]="pdfUrl()"
           [showBorders]="true"
           [useBareURls]="true"
         ></ngx-extended-pdf-viewer>
       </div>
 
-      <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage }}
+      <div *ngIf="errorMessage()" class="error-message">
+        {{ errorMessage() }}
         <a routerLink="/list" class="btn">Back to PDFs</a>
       </div>
     </div>
@@ -101,28 +102,28 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
   `]
 })
 export class ViewerComponent implements OnInit {
-  fileId: string | null = null;
-  fileName = 'PDF Viewer';
-  pdfUrl: string | null = null;
-  loading = true;
-  errorMessage = '';
+  fileId = signal<string | null>(null);
+  fileName = signal('PDF Viewer');
+  pdfUrl = signal<string | null>(null);
+  loading = signal(true);
+  errorMessage = signal('');
 
   constructor(private route: ActivatedRoute, private pdfService: PdfService) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.fileId = params['id'];
-      if (this.fileId) {
+      this.fileId.set(params['id']);
+      if (this.fileId()) {
         this.loadPdf();
       }
     });
   }
 
   private loadPdf(): void {
-    if (!this.fileId) return;
+    if (!this.fileId()) return;
 
-    this.loading = true;
-    this.pdfUrl = this.pdfService.getPdfUrl(this.fileId);
-    this.loading = false;
+    this.loading.set(true);
+    this.pdfUrl.set(this.pdfService.getPdfUrl(this.fileId()!));
+    this.loading.set(false);
   }
 }

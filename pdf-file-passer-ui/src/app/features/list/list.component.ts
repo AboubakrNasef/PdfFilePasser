@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { signal } from '@angular/core';
 import { PdfService } from '../../shared/services/pdf.service';
 import { PdfFileInfo } from '../../shared/models/pdf.model';
 
@@ -12,17 +13,17 @@ import { PdfFileInfo } from '../../shared/models/pdf.model';
     <div class="list-container">
       <h2>My PDFs</h2>
 
-      <div *ngIf="loading" class="loading">
+      <div *ngIf="pdfService.loading()" class="loading">
         <p>Loading your PDFs...</p>
       </div>
 
-      <div *ngIf="!loading && pdfs.length === 0" class="empty-state">
+      <div *ngIf="!pdfService.loading() && pdfService.pdfs().length === 0" class="empty-state">
         <p>No PDFs uploaded yet.</p>
         <a routerLink="/upload" class="btn">Upload your first PDF</a>
       </div>
 
-      <div *ngIf="!loading && pdfs.length > 0" class="pdf-grid">
-        <div *ngFor="let pdf of pdfs" class="pdf-card">
+      <div *ngIf="!pdfService.loading() && pdfService.pdfs().length > 0" class="pdf-grid">
+        <div *ngFor="let pdf of pdfService.pdfs()" class="pdf-card">
           <div class="pdf-header">
             <h3>{{ pdf.fileName }}</h3>
             <span class="file-size">{{ formatFileSize(pdf.fileSizeBytes) }}</span>
@@ -59,8 +60,8 @@ import { PdfFileInfo } from '../../shared/models/pdf.model';
         </div>
       </div>
 
-      <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage }}
+      <div *ngIf="pdfService.error()" class="error-message">
+        {{ pdfService.error() }}
       </div>
     </div>
   `,
@@ -203,30 +204,12 @@ import { PdfFileInfo } from '../../shared/models/pdf.model';
   `]
 })
 export class ListComponent implements OnInit {
-  pdfs: PdfFileInfo[] = [];
-  loading = true;
-  errorMessage = '';
+  errorMessage = signal('');
 
-  constructor(private pdfService: PdfService) {}
+  constructor(public pdfService: PdfService) {}
 
   ngOnInit(): void {
-    this.loadPdfs();
-  }
-
-  loadPdfs(): void {
-    this.loading = true;
-    this.errorMessage = '';
-
-    this.pdfService.listPdfs().subscribe({
-      next: (data) => {
-        this.pdfs = data;
-        this.loading = false;
-      },
-      error: (error) => {
-        this.errorMessage = 'Failed to load PDFs. Please try again.';
-        this.loading = false;
-      }
-    });
+    this.pdfService.loadPdfs();
   }
 
   downloadPdf(pdf: PdfFileInfo): void {
@@ -240,7 +223,7 @@ export class ListComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: () => {
-        this.errorMessage = 'Failed to download PDF.';
+        this.errorMessage.set('Failed to download PDF.');
       }
     });
   }
@@ -249,10 +232,10 @@ export class ListComponent implements OnInit {
     if (confirm('Are you sure you want to delete this PDF?')) {
       this.pdfService.deletePdf(fileId).subscribe({
         next: () => {
-          this.loadPdfs();
+          this.pdfService.loadPdfs();
         },
         error: () => {
-          this.errorMessage = 'Failed to delete PDF.';
+          this.errorMessage.set('Failed to delete PDF.');
         }
       });
     }

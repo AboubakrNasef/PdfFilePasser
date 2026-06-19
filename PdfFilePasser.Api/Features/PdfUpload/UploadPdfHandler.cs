@@ -1,6 +1,8 @@
+using PdfFilePasser.Api.Storage;
+
 namespace PdfFilePasser.Api.Features.PdfUpload;
 
-public class UploadPdfHandler(IStorageFolder pdfFolder)
+public class UploadPdfHandler(IStorage storage)
 {
     public async Task<UploadPdfResponse> Handle(UploadPdfRequest request, CancellationToken cancellation)
     {
@@ -8,19 +10,16 @@ public class UploadPdfHandler(IStorageFolder pdfFolder)
         var fileName = Path.GetFileNameWithoutExtension(request.File.FileName);
         var blobName = $"{fileName}_{fileId}.pdf";
 
-        using var stream = request.File.OpenReadStream();
+        var stream = request.File.OpenReadStream();
+        var blob = await storage.WriteAsync(blobName, stream, true, cancellation);
 
-        // Upload using FluentStorage's simple fluent API
-        var file = await pdfFolder.WriteAsync(blobName, stream, cancellation);
-
-        // Set metadata properties
         var properties = new Dictionary<string, string>
         {
             { "OriginalFileName", request.File.FileName },
             { "ContentType", request.File.ContentType ?? "application/pdf" },
             { "Description", request.Description ?? string.Empty }
         };
-        await file.SetPropertiesAsync(properties, cancellation);
+        await blob.SetPropertiesAsync(properties, cancellation);
 
         return new UploadPdfResponse
         {
