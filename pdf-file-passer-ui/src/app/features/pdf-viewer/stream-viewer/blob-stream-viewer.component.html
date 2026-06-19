@@ -8,18 +8,18 @@
   </div>
 
   <div class="viewer-content">
-    @if (loading) {
+    @if (loading()) {
       <div class="loading">
         <p>Loading PDF...</p>
       </div>
-    } @else if (error) {
+    } @else if (error()) {
       <div class="error">
-        <p>{{ error }}</p>
+        <p>{{ error ()}}</p>
         <button (click)="goBack()" class="btn btn-secondary">Go Back</button>
       </div>
-    } @else if (streamUrl) {
+    } @else if (streamUrl()) {
       <ngx-extended-pdf-viewer
-        [src]="streamUrl"
+        [src]="streamUrl()!"
         [showSidebarButton]="true"
   >
       </ngx-extended-pdf-viewer>

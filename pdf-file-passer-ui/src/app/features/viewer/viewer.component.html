@@ -12,12 +12,12 @@
   </div>
 
   <div class="viewer-content">
-    @if (selectedMethod() === 'blob') {
+    @if (selectedMethod() === 'bytes') {
       <app-blob-viewer />
-    } @else if (selectedMethod() === 'stream') {
-      <app-stream-viewer />
-    } @else if (selectedMethod() === 'direct-stream') {
-      <app-direct-stream-viewer />
+    } @else if (selectedMethod() === 'blobstorage-stream') {
+      <app-blob-stream-viewer />
+    } @else if (selectedMethod() === 'memory-stream') {
+      <app-memory-stream-viewer />
     }
   </div>
 </div>

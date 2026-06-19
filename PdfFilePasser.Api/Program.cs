@@ -95,7 +95,7 @@ builder.Services.AddScoped<DownloadPdfHandler>();
 builder.Services.AddScoped<ListPdfsHandler>();
 builder.Services.AddScoped<DeletePdfHandler>();
 builder.Services.AddScoped<ViewPdfHandler>();
-builder.Services.AddScoped<StreamPdfHandler>();
+
 
 var app = builder.Build();
 

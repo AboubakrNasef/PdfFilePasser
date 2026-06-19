@@ -4,81 +4,89 @@ namespace PdfFilePasser.Api.Features.StreamPdf;
 
 public static class StreamPdfEndpoint
 {
-    public static void MapStreamPdfEndpoint(this WebApplication app)
-    {
-        // Method 2: Stream URL (returns metadata with direct blob URL)
-        app.MapGet("/api/pdf/{fileId}/stream-url", HandleStreamUrl)
-            .WithName("StreamPdfUrl")
-            .WithOpenApi()
-            .WithSummary("Get PDF stream URL")
-            .WithDescription("Get the stream URL for a PDF file. Use this URL directly in an iframe.")
-            .RequireCors("AllowAngular")
-            .Produces(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+	public static void MapStreamPdfEndpoint(this WebApplication app)
+	{
+		// Method 2: Memory Stream (downloads PDF to memory and returns as stream)
+		app.MapGet("/api/pdf/{fileId}/memory-stream", HandleMemoryStream)
+			.WithName("StreamPdfMemoryStream")
+			.WithOpenApi()
+			.WithSummary("Get PDF as memory stream")
+			.WithDescription("Download PDF to memory stream and return it as bytes. Entire file is loaded into memory.")
+			.RequireCors("AllowAngular")
+			.Produces(StatusCodes.Status200OK)
+			.Produces(StatusCodes.Status404NotFound);
 
-        // Method 3: Direct PDF Stream (streams the PDF file directly)
-        app.MapGet("/api/pdf/{fileId}/stream", HandleDirectStream)
-            .WithName("StreamPdfDirect")
-            .WithOpenApi()
-            .WithSummary("Stream PDF file directly")
-            .WithDescription("Stream PDF file directly as bytes. Use this URL directly in an iframe src.")
-            .RequireCors("AllowAngular")
-            .Produces(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
-    }
+		// Method 3: Blob Storage Stream (streams the PDF file directly from blob storage)
+		app.MapGet("/api/pdf/{fileId}/blob-stream", HandleBlobStorageStream)
+			.WithName("StreamPdfDirect")
+			.WithOpenApi()
+			.WithSummary("Stream PDF file directly")
+			.WithDescription("Stream PDF file directly as bytes. Use this URL directly in an iframe src.")
+			.RequireCors("AllowAngular")
+			.Produces(StatusCodes.Status200OK)
+			.Produces(StatusCodes.Status404NotFound);
+	}
 
-    private static async Task<IResult> HandleStreamUrl(
-        string fileId,
-        StreamPdfHandler handler,
-        CancellationToken cancellation)
-    {
-        try
-        {
-            var response = await handler.Handle(fileId, cancellation);
-            return Results.Ok(response);
-        }
-        catch (Exception ex) when (ex.Message.Contains("not found"))
-        {
-            return Results.NotFound("PDF not found");
-        }
-    }
+	private static async Task<IResult> HandleMemoryStream(
+		string fileId,
+		IStorage storage,
+		CancellationToken cancellation)
+	{
+		try
+		{
+			var blobs = await storage.ListBlobsAsync(cancellation);
+			var blob = blobs.FirstOrDefault(b => b.Name.EndsWith($"_{fileId}.pdf"));
 
-    private static async Task<IResult> HandleDirectStream(
-        string fileId,
-        IStorage storage,
-        ILogger<StreamPdfHandler> logger,
-        CancellationToken cancellation)
-    {
-        try
-        {
-            logger.LogInformation("Starting direct PDF stream: FileId={FileId}", fileId);
+			if (blob == null)
+			{
+				return Results.NotFound("PDF not found");
+			}
 
-            var blobs = await storage.ListBlobsAsync(cancellation);
-            var blob = blobs.FirstOrDefault(b => b.Name.EndsWith($"_{fileId}.pdf"));
+			var properties = await blob.GetPropertiesAsync(cancellation);
 
-            if (blob == null)
-            {
-                logger.LogWarning("PDF not found for direct streaming: FileId={FileId}", fileId);
-                return Results.NotFound("PDF not found");
-            }
+			var fileName = properties.TryGetValue("OriginalFileName", out var name) ? name : blob.Name;
+			var contentType = properties.TryGetValue("ContentType", out var ct) ? ct : "application/pdf";
 
-            logger.LogDebug("Found blob: {BlobName}, Size={Size}", blob.Name, blob.Size);
-            var properties = await blob.GetPropertiesAsync(cancellation);
+			var bytes =await storage.GetBlobAsBytesAsync(blob.Name, cancellation);
 
-            var fileName = properties.TryGetValue("OriginalFileName", out var name) ? name : blob.Name;
-            var contentType = properties.TryGetValue("ContentType", out var ct) ? ct : "application/pdf";
+			return Results.File(new MemoryStream(bytes), contentType, fileName, enableRangeProcessing: true);
+		}
+		catch (Exception ex)
+		{
 
-            logger.LogInformation("Streaming PDF directly: FileId={FileId}, BlobName={BlobName}, Size={Size}",
-                fileId, blob.Name, blob.Size);
+			return Results.StatusCode(StatusCodes.Status500InternalServerError);
+		}
+	}
 
-            var stream = await blob.OpenReadAsync(cancellation);
+	private static async Task<IResult> HandleBlobStorageStream(
+		string fileId,
+		IStorage storage,
+		CancellationToken cancellation)
+	{
+		try
+		{
 
-            return Results.File(stream, contentType, fileName, enableRangeProcessing: true);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error in direct PDF stream: FileId={FileId}", fileId);
-            return Results.StatusCode(StatusCodes.Status500InternalServerError);
-        }
-    }
+			var blobs = await storage.ListBlobsAsync(cancellation);
+			var blob = blobs.FirstOrDefault(b => b.Name.EndsWith($"_{fileId}.pdf"));
+
+			if (blob == null)
+			{
+				return Results.NotFound("PDF not found");
+			}
+
+			var properties = await blob.GetPropertiesAsync(cancellation);
+
+			var fileName = properties.TryGetValue("OriginalFileName", out var name) ? name : blob.Name;
+			var contentType = properties.TryGetValue("ContentType", out var ct) ? ct : "application/pdf";
+
+
+			var stream = await blob.OpenReadAsync(cancellation);
+
+			return Results.File(stream, contentType, fileName, enableRangeProcessing: true);
+		}
+		catch (Exception ex)
+		{
+			return Results.StatusCode(StatusCodes.Status500InternalServerError);
+		}
+	}
 }

@@ -1,21 +1,22 @@
 import { Component, signal, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+
 import { PdfService } from '../../../shared/services/pdf.service';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 @Component({
-  selector: 'app-blob-viewer',
+  selector: 'app-blob-stream-viewer',
   standalone: true,
   imports: [CommonModule, NgxExtendedPdfViewerModule],
-  templateUrl: './blob-viewer.component.html',
-  styleUrl: './blob-viewer.component.css'
+  templateUrl: './blob-stream-viewer.component.html',
+  styleUrl: './blob-stream-viewer.component.css'
 })
-export class BlobViewerComponent {
+export class BlobStreamViewerComponent {
 
   fileId = signal<string | null>(null);
   fileName = signal<string | null>(null);
-  pdfUrl = signal<string | null>(null);
+  streamUrl = signal<string | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
 
@@ -41,31 +42,13 @@ export class BlobViewerComponent {
 
     this.loading.set(true);
     this.error.set(null);
-    this.pdfUrl.set(null);
+    this.streamUrl.set(null);
 
-    console.log('Starting to load PDF for fileId:', id);
+    console.log('Starting to load blob storage stream PDF for fileId:', id);
 
-    this.pdfService.viewPdf(id).subscribe({
-      next: (response) => {
-        console.log('PDF data received, size:', response.pdfBytes?.length || 0);
-        this.fileName.set(response.fileName);
-
-        const pdfData = typeof response.pdfBytes === 'string'
-          ? this.base64ToBytes(response.pdfBytes)
-          : response.pdfBytes;
-
-        const blob = new Blob([pdfData], { type: 'application/pdf' });
-        this.pdfUrl.set(URL.createObjectURL(blob));
-
-        console.log('PDF blob URL created:', this.pdfUrl());
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading PDF:', error);
-        this.error.set(`Failed to load PDF: ${error.status} ${error.statusText}`);
-        this.loading.set(false);
-      }
-    });
+    this.streamUrl.set(this.pdfService.getBlobStreamUrl(id));
+    this.fileName.set(id + '.pdf');
+    this.loading.set(false);
   }
 
   downloadPdf() {
@@ -92,14 +75,5 @@ export class BlobViewerComponent {
 
   goBack() {
     this.router.navigate(['/list']);
-  }
-
-  private base64ToBytes(base64: string): Uint8Array {
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes;
   }
 }

@@ -1,44 +1,44 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BlobViewerComponent } from '../pdf-viewer/blob-viewer/blob-viewer.component';
-import { DirectStreamViewerComponent } from '../pdf-viewer/direct-stream-viewer/direct-stream-viewer.component';
-import { StreamViewerComponent } from '../pdf-viewer/stream-viewer/stream-viewer.component';
+import { BlobStreamViewerComponent } from '../pdf-viewer/stream-viewer/blob-stream-viewer.component';
+import { MemoryStreamViewerComponent } from '../pdf-viewer/direct-stream-viewer/memory-stream-viewer.component';
 
 interface Method {
-  id: 'blob' | 'stream' | 'direct-stream';
+  id: allowedViewMethod;
   label: string;
   icon: string;
 }
-
+type  allowedViewMethod='bytes' | 'memory-stream' | 'blobstorage-stream';
 @Component({
   selector: 'app-viewer',
   standalone: true,
-  imports: [CommonModule, BlobViewerComponent, StreamViewerComponent, DirectStreamViewerComponent],
+  imports: [CommonModule, BlobViewerComponent, BlobStreamViewerComponent, MemoryStreamViewerComponent],
   templateUrl: './viewer.component.html',
   styleUrl: './viewer.component.css'
 })
 export class ViewerComponent {
-  public selectedMethod = signal<'blob' | 'stream' | 'direct-stream'>('blob');
+  public selectedMethod = signal<allowedViewMethod>('bytes');
 
   public allowedMethods = signal<Method[]>([
     {
-      id: 'blob',
-      label: 'Blob Viewer',
+      id: 'bytes',
+      label: 'bytes viewer',
       icon: '📥'
     },
     {
-      id: 'stream',
-      label: 'Stream Viewer',
+      id: 'memory-stream',
+      label: 'memory stream Viewer',
       icon: '🔗'
     },
     {
-      id: 'direct-stream',
-      label: 'Direct Stream',
+      id: 'blobstorage-stream',
+      label: 'BlobStorage Stream Viewer',
       icon: '▶️'
     }
   ])
 
-  selectMethod(method: 'blob' | 'stream' | 'direct-stream') {
+  selectMethod(method:allowedViewMethod) {
     this.selectedMethod.set(method);
   }
 }
