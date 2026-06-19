@@ -73,9 +73,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // Register Azure Blob Storage
-var storageConnectionString = builder.Configuration["AzureStorage:ConnectionString"]
+var storageConnectionString = builder.Configuration["BLOBS_CONNECTIONSTRING"]
     ?? "UseDevelopmentStorage=true";
-var containerName = builder.Configuration["AzureStorage:ContainerName"] ?? "pdffiles";
+ var containerName = builder.Configuration["AzureStorage:ContainerName"] ?? "pdffiles";
 
 builder.Services.AddSingleton<IStorage>(sp =>
 {
@@ -84,7 +84,7 @@ builder.Services.AddSingleton<IStorage>(sp =>
 
     var blobServiceClient = new BlobServiceClient(storageConnectionString);
     var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-    return new AzureBlobStorage(blobContainerClient, logger);
+    return new AzureBlobStorage(blobContainerClient);
 });
 
 // Register handlers as scoped
