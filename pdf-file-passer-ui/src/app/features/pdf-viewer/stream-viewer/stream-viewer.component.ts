@@ -1,18 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NgxExtendedPdfViewerComponent } from 'ngx-extended-pdf-viewer';
+
 import { PdfService } from '../../../shared/services/pdf.service';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 @Component({
   selector: 'app-stream-viewer',
   standalone: true,
-  imports: [CommonModule, NgxExtendedPdfViewerComponent],
+  imports: [CommonModule, NgxExtendedPdfViewerModule],
   templateUrl: './stream-viewer.component.html',
   styleUrl: './stream-viewer.component.css'
 })
 export class StreamViewerComponent implements OnInit {
-  @ViewChild(NgxExtendedPdfViewerComponent) pdfViewer!: NgxExtendedPdfViewerComponent;
 
   fileId: string | null = null;
   fileName: string | null = null;

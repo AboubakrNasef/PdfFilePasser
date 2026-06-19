@@ -1,18 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NgxExtendedPdfViewerComponent } from 'ngx-extended-pdf-viewer';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { PdfService } from '../../../shared/services/pdf.service';
 
 @Component({
   selector: 'app-blob-viewer',
   standalone: true,
-  imports: [CommonModule, NgxExtendedPdfViewerComponent],
+  imports: [CommonModule, NgxExtendedPdfViewerModule],
   templateUrl: './blob-viewer.component.html',
   styleUrl: './blob-viewer.component.css'
 })
 export class BlobViewerComponent implements OnInit {
-  @ViewChild(NgxExtendedPdfViewerComponent) pdfViewer!: NgxExtendedPdfViewerComponent;
 
   fileId: string | null = null;
   fileName: string | null = null;
