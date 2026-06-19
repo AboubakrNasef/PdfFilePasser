@@ -9,6 +9,7 @@ public static class DeletePdfEndpoint
             .WithOpenApi()
             .WithSummary("Delete a PDF file")
             .WithDescription("Delete a PDF file by its file ID.")
+            .RequireCors("AllowAngular")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
     }

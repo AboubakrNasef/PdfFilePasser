@@ -9,6 +9,7 @@ public static class DownloadPdfEndpoint
             .WithOpenApi()
             .WithSummary("Download a PDF file")
             .WithDescription("Download a PDF file by its file ID.")
+            .RequireCors("AllowAngular")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
     }

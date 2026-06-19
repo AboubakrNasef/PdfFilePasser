@@ -15,9 +15,7 @@ var api = builder.AddProject<Projects.PdfFilePasser_Api>("Api")
 	.WithReference(blobs)
 	.WaitFor(blobs);
 
-var ui = builder.AddViteApp("ui", "../../pdf-file-passer-ui")
-	.WithCommand("start")
-	.WithHttpEndpoint(port: 4200, env: "PORT")
+var ui = builder.AddJavaScriptApp("ui", "../../pdf-file-passer-ui","start")
 	.WithReference(api);
 
 builder.Build().Run();

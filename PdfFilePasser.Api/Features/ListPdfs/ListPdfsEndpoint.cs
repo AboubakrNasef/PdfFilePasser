@@ -9,6 +9,7 @@ public static class ListPdfsEndpoint
             .WithOpenApi()
             .WithSummary("List all PDF files")
             .WithDescription("Retrieve a list of all uploaded PDF files with their metadata.")
+            .RequireCors("AllowAngular")
             .Produces<IEnumerable<object>>(StatusCodes.Status200OK);
     }
 

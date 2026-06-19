@@ -1,4 +1,8 @@
 using Azure.Storage.Blobs;
+using OpenTelemetry;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using PdfFilePasser.Api.Features.PdfUpload;
 using PdfFilePasser.Api.Features.DownloadPdf;
 using PdfFilePasser.Api.Features.ListPdfs;
@@ -12,13 +16,50 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy
+            .SetIsOriginAllowed(origin => true)
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowCredentials()
+            .WithExposedHeaders("Content-Type", "Content-Disposition");
     });
 });
 
 builder.Services.AddOpenApi();
+
+// Configure Logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+// Configure OpenTelemetry
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation(options =>
+            {
+                options.RecordException = true;
+            })
+            .AddHttpClientInstrumentation(options =>
+            {
+                options.RecordException = true;
+            })
+            .AddConsoleExporter();
+    })
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddConsoleExporter();
+    });
+
+// Configure structured logging with OpenTelemetry
+builder.Logging.AddOpenTelemetry(options =>
+{
+    options.AddConsoleExporter();
+});
 
 // Add Swagger/Swashbuckle
 builder.Services.AddSwaggerGen(options =>
@@ -51,6 +92,26 @@ builder.Services.AddScoped<DeletePdfHandler>();
 
 var app = builder.Build();
 
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+// Middleware - CORS must be before routing
+app.UseCors("AllowAngular");
+
+// Request logging middleware for CORS debugging
+app.Use(async (context, next) =>
+{
+    var origin = context.Request.Headers.Origin.ToString();
+    var method = context.Request.Method;
+    var path = context.Request.Path;
+
+    if (!string.IsNullOrEmpty(origin))
+    {
+        logger.LogInformation("Request: {Method} {Path} from Origin: {Origin}", method, path, origin);
+    }
+
+    await next();
+});
+
 // Middleware
 if (app.Environment.IsDevelopment())
 {
@@ -62,8 +123,6 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty;
     });
 }
-
-app.UseCors("AllowAngular");
 
 // Map endpoints
 app.MapUploadPdfEndpoint();

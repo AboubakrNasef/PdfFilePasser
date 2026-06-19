@@ -11,7 +11,9 @@ export class PdfService {
   loading = signal(false);
   error = signal<string>('');
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('PDF Service initialized with API URL:', this.apiUrl);
+  }
 
   uploadPdf(file: File, description?: string) {
     const formData = new FormData();
@@ -25,13 +27,20 @@ export class PdfService {
     this.loading.set(true);
     this.error.set('');
 
-    this.http.get<PdfFileInfo[]>(`${this.apiUrl}/list`).subscribe({
+    const apiUrl = `${this.apiUrl}/list`;
+    console.log('Fetching PDFs from:', apiUrl);
+
+    this.http.get<PdfFileInfo[]>(apiUrl).subscribe({
       next: (data) => {
+        console.log('PDFs loaded successfully:', data.length, 'files');
         this.pdfs.set(data);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('Failed to load PDFs. Please try again.');
+      error: (error) => {
+        console.error('Error loading PDFs:', error);
+        console.error('Status:', error.status);
+        console.error('Message:', error.message);
+        this.error.set(`Failed to load PDFs: ${error.status} ${error.statusText}`);
         this.loading.set(false);
       }
     });

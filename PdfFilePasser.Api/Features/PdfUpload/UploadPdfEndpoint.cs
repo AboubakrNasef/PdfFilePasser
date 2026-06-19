@@ -9,6 +9,7 @@ public static class UploadPdfEndpoint
             .WithOpenApi()
             .WithSummary("Upload a PDF file")
             .WithDescription("Upload a new PDF file to the storage. Returns file ID, name, upload timestamp, and file size.")
+            .RequireCors("AllowAngular")
             .Produces<UploadPdfResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Accepts<UploadPdfRequest>("multipart/form-data");
