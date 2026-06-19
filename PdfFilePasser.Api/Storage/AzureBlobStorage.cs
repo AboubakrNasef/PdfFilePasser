@@ -13,7 +13,7 @@ public class AzureBlobStorage : IStorage
 
     public async Task<IBlobObject> WriteAsync(string blobName, Stream content, bool overwrite = true, CancellationToken cancellation = default)
     {
-        var blobClient = _containerClient.GetBlockBlobClient(blobName);
+        var blobClient = _containerClient.GetBlobClient(blobName);
         await blobClient.UploadAsync(content, overwrite: overwrite, cancellationToken: cancellation);
         return new AzureBlobObject(blobClient, _containerClient.Name);
     }
@@ -23,7 +23,7 @@ public class AzureBlobStorage : IStorage
         var blobs = new List<IBlobObject>();
         await foreach (var blobItem in _containerClient.GetBlobsAsync(cancellationToken: cancellation))
         {
-            var blobClient = _containerClient.GetBlockBlobClient(blobItem.Name);
+            var blobClient = _containerClient.GetBlobClient(blobItem.Name);
             blobs.Add(new AzureBlobObject(blobClient, _containerClient.Name));
         }
         return blobs;
@@ -37,8 +37,24 @@ public class AzureBlobStorage : IStorage
     public async Task DeleteAsync(string blobPath, CancellationToken cancellation = default)
     {
         var blobName = ExtractBlobName(blobPath);
-        var blobClient = _containerClient.GetBlockBlobClient(blobName);
-        await blobClient.DeleteAsync(cancellation: cancellation);
+        var blobClient = _containerClient.GetBlobClient(blobName);
+        await blobClient.DeleteAsync(cancellationToken: cancellation);
+    }
+
+    public async Task<Stream> GetBlobAsStreamAsync(string blobName, CancellationToken cancellation = default)
+    {
+        var blobClient = _containerClient.GetBlobClient(blobName);
+        var download = await blobClient.DownloadAsync(cancellation);
+        return download.Value.Content;
+    }
+
+    public async Task<byte[]> GetBlobAsBytesAsync(string blobName, CancellationToken cancellation = default)
+    {
+        var blobClient = _containerClient.GetBlobClient(blobName);
+        var download = await blobClient.DownloadAsync(cancellation);
+        using var memoryStream = new MemoryStream();
+        await download.Value.Content.CopyToAsync(memoryStream, cancellation);
+        return memoryStream.ToArray();
     }
 
     private string ExtractBlobName(string blobPath)

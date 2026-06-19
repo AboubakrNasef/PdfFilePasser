@@ -6,4 +6,6 @@ public interface IStorage
     Task<List<IBlobObject>> ListBlobsAsync(CancellationToken cancellation = default);
     Task<List<IBlobObject>> ListFilesAsync(object? options = null, object? prefix = null, CancellationToken cancellation = default);
     Task DeleteAsync(string blobPath, CancellationToken cancellation = default);
+    Task<Stream> GetBlobAsStreamAsync(string blobName, CancellationToken cancellation = default);
+    Task<byte[]> GetBlobAsBytesAsync(string blobName, CancellationToken cancellation = default);
 }

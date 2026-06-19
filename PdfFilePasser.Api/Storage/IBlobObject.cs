@@ -8,6 +8,8 @@ public interface IBlobObject
     DateTimeOffset? Modified { get; }
 
     Task<Stream> OpenReadAsync(CancellationToken cancellation = default);
+    Task<Stream> ReadAsStreamAsync(CancellationToken cancellation = default);
+    Task<byte[]> ReadAsBytesAsync(CancellationToken cancellation = default);
     Task DeleteAsync(CancellationToken cancellation = default);
     Task<Dictionary<string, string>> GetPropertiesAsync(CancellationToken cancellation = default);
     Task SetPropertiesAsync(Dictionary<string, string> properties, CancellationToken cancellation = default);
