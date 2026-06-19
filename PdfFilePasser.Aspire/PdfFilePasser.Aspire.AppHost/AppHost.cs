@@ -10,7 +10,14 @@ if (builder.Environment.IsDevelopment())
 {
 	storage.RunAsEmulator();
 }
+
 var api = builder.AddProject<Projects.PdfFilePasser_Api>("Api")
 	.WithReference(blobs)
 	.WaitFor(blobs);
+
+var ui = builder.AddViteApp("ui", "../../pdf-file-passer-ui")
+	.WithCommand("start")
+	.WithHttpEndpoint(port: 4200, env: "PORT")
+	.WithReference(api);
+
 builder.Build().Run();

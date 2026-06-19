@@ -24,7 +24,6 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
         <ngx-extended-pdf-viewer
           [src]="pdfUrl()"
           [showBorders]="true"
-          [useBareURls]="true"
         ></ngx-extended-pdf-viewer>
       </div>
 
@@ -104,7 +103,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 export class ViewerComponent implements OnInit {
   fileId = signal<string | null>(null);
   fileName = signal('PDF Viewer');
-  pdfUrl = signal<string | null>(null);
+  pdfUrl = signal<string >('');
   loading = signal(true);
   errorMessage = signal('');
 

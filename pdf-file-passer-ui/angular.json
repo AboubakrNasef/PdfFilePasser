@@ -25,8 +25,7 @@
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
-            "scripts": [],
-            "ngZone": "zone-less"
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -53,14 +52,14 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "pdf-file-passer-ui:build"
+            "buildTarget": "pdf-file-passer-ui:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "pdf-file-passer-ui:build:production"
+              "buildTarget": "pdf-file-passer-ui:build:production"
             },
             "development": {
-              "browserTarget": "pdf-file-passer-ui:build:development"
+              "buildTarget": "pdf-file-passer-ui:build:development"
             }
           },
           "defaultConfiguration": "development"
